@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% block title %}Import catalogue · KIT FAQ Console{% endblock %}
+{% block content %}
+<header class="page-heading">
+    <div><a class="breadcrumb" href="{{ url_for('admin_dashboard') }}">← FAQ catalogue</a><h1>Import catalogue</h1><p>Validate a complete JSON catalogue before replacing the current records.</p></div>
+</header>
+
+{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+{% if success %}<div class="notice success" role="status">{{ success }}</div>{% endif %}
+
+<div class="import-layout">
+    <form method="post" class="form-card import-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-card-heading"><span class="step-number">1</span><div><h2>Catalogue JSON</h2><p>Paste a non-empty array of governed FAQ records.</p></div></div>
+        <div class="form-fields">
+            <div class="field-group full-span"><label for="import-content">FAQ JSON array</label><textarea id="import-content" class="code-input" name="content" rows="22" spellcheck="false" required>{{ content }}</textarea></div>
+        </div>
+        <div class="import-actions"><button name="action" value="validate" class="button secondary">Validate only</button></div>
+
+        <div class="replace-panel">
+            <div><strong>Apply replacement</strong><p>Applying the import versions existing records and archives IDs omitted from the new catalogue.</p></div>
+            <label for="import-confirm">Type <code>REPLACE</code> to confirm</label>
+            <div class="confirm-row"><input id="import-confirm" name="confirm" autocomplete="off" placeholder="REPLACE"><button name="action" value="import" class="button danger">Apply import</button></div>
+        </div>
+    </form>
+
+    <aside class="import-guide">
+        <h2>Required structure</h2>
+        <p>Every item needs a unique ID, question, English answer and governance fields.</p>
+        <pre><code>[
+  {
+    "id": "faq_library_hours",
+    "question": "When is the library open?",
+    "answer": "The library is open...",
+    "category": "library",
+    "status": "published",
+    "last_verified": "2026-09-27"
+  }
+]</code></pre>
+        <ul><li>Validate before applying.</li><li>IDs should remain stable between imports.</li><li>Only published records answer users.</li><li>Export a backup before large changes.</li></ul>
+        <a href="{{ url_for('admin_faq_export') }}">Download current catalogue →</a>
+    </aside>
+</div>
+{% endblock %}

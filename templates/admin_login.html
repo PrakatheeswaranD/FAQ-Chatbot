@@ -1,0 +1,45 @@
+{% extends "admin_base.html" %}
+{% block title %}Sign in · KIT FAQ Console{% endblock %}
+{% block login_content %}
+<section class="login-card">
+    <div class="login-card-heading">
+        <span class="secure-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        </span>
+        <div>
+            <p class="eyebrow">Restricted access</p>
+            <h1>Sign in to the FAQ console</h1>
+            <p>Manage published answers, review unresolved questions and track catalogue changes.</p>
+        </div>
+    </div>
+
+    {% if configured is defined and not configured %}
+    <div class="notice error">Admin access is not configured. Set ADMIN_PASSWORD_HASH.</div>
+    {% endif %}
+    {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+
+    <form method="post" class="login-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="field-group">
+            <label for="admin-username">Username</label>
+            <input id="admin-username" name="username" autocomplete="username" placeholder="Enter your username" required autofocus>
+        </div>
+
+        <div class="field-group">
+            <label for="admin-password">Password</label>
+            <div class="password-field">
+                <input id="admin-password" type="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+                <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password" aria-pressed="false" title="Show password">
+                    <svg class="eye-show" aria-hidden="true" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg class="eye-hide" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a17.4 17.4 0 0 1-2.1 2.8M6.5 6.5C4 8.2 2.5 12 2.5 12s3.5 6 9.5 6c1.6 0 3-.4 4.3-1"></path><path d="M9.9 9.9A3 3 0 0 0 14.1 14.1"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="button primary full-width">Sign in</button>
+    </form>
+    <p class="login-footnote">Authorised staff only. Every catalogue change is recorded in the audit trail.</p>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/admin_login.js') }}"></script>{% endblock %}

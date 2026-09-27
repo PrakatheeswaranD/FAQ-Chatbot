@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KIT FAQ chatbot administration console">
+    <title>{% block title %}KIT FAQ Admin{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="{% if session.get('admin_authenticated') %}admin-app{% else %}login-page{% endif %}">
+    {% if session.get('admin_authenticated') %}
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <a class="admin-brand" href="{{ url_for('admin_dashboard') }}">
+                <span class="admin-brand-mark">KIT</span>
+                <span><strong>FAQ Console</strong><small>Knowledge operations</small></span>
+            </a>
+
+            <nav class="sidebar-nav" aria-label="Administration">
+                <p class="nav-label">Workspace</p>
+                <a class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+                    Overview
+                </a>
+                <a class="nav-item {% if request.endpoint in ['admin_faq_new', 'admin_faq_edit'] %}active{% endif %}" href="{{ url_for('admin_faq_new') }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+                    New FAQ
+                </a>
+                <a class="nav-item {% if request.endpoint == 'admin_faq_import' %}active{% endif %}" href="{{ url_for('admin_faq_import') }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+                    Import catalogue
+                </a>
+                <a class="nav-item" href="{{ url_for('admin_faq_export') }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"></path><path d="M5 20h14"></path></svg>
+                    Export JSON
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a class="public-link" href="{{ url_for('home') }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 5h5v5M10 14 19 5"></path><path d="M19 14v5H5V5h5"></path></svg>
+                    View chatbot
+                </a>
+                <div class="admin-profile">
+                    <span class="profile-avatar">{{ session.get('admin_username', 'A')[0]|upper }}</span>
+                    <span><strong>{{ session.get('admin_username', 'Administrator') }}</strong><small>Administrator</small></span>
+                    <form method="post" action="{{ url_for('admin_logout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="signout-button" aria-label="Sign out" title="Sign out">
+                            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="workspace">
+            <header class="mobile-header">
+                <a class="admin-brand" href="{{ url_for('admin_dashboard') }}"><span class="admin-brand-mark">KIT</span><strong>FAQ Console</strong></a>
+                <a href="{{ url_for('home') }}">View chatbot</a>
+            </header>
+            <main class="admin-main">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                    <div class="notice {{ category }}" role="status">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+    <header class="login-header">
+        <a class="admin-brand" href="{{ url_for('home') }}">
+            <span class="admin-brand-mark">KIT</span>
+            <span><strong>FAQ Console</strong><small>Administration</small></span>
+        </a>
+        <a class="back-link" href="{{ url_for('home') }}">Back to chatbot</a>
+    </header>
+    <main class="login-main">
+        {% block login_content %}{% endblock %}
+    </main>
+    {% endif %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

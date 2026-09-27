@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Official KIT FAQ assistant for admissions, academics, campus facilities and placements.">
+    <title>KIT FAQ Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="KIT FAQ Assistant home">
+                <span class="brand-mark" aria-hidden="true">KIT</span>
+                <span class="brand-copy">
+                    <strong>FAQ Chatbot</strong>
+                    <small>Kalaignar Karunanidhi Institute of Technology</small>
+                </span>
+            </a>
+
+            <nav class="site-nav" aria-label="Primary navigation">
+                <span class="service-status"><span aria-hidden="true"></span> Online</span>
+                <a class="admin-link" href="{{ url_for('admin_login') }}">Staff admin</a>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="intro-panel" aria-labelledby="intro-title">
+                <span class="eyebrow">Official information, instantly</span>
+                <h1 id="intro-title">How can we help you today?</h1>
+                <p class="intro-copy">
+                    Ask about KIT admissions, courses, examinations, fees, hostel,
+                    transport or placements. Every response comes only from the
+                    approved FAQ catalogue.
+                </p>
+
+                <div class="topic-list" aria-label="Example questions">
+                    <p>Try asking</p>
+                    <button type="button" class="suggestion" data-question="What are the library working hours?">
+                        What are the library hours?
+                    </button>
+                    <button type="button" class="suggestion" data-question="What courses are offered at KIT?">
+                        Which courses are offered?
+                    </button>
+                    <button type="button" class="suggestion" data-question="Does KIT provide hostel facilities?">
+                        Are hostel facilities available?
+                    </button>
+                </div>
+
+                <div class="trust-note">
+                    <span class="trust-icon" aria-hidden="true">✓</span>
+                    <p><strong>Grounded answers</strong><br>When an answer is not in the approved FAQs, the assistant says so instead of guessing.</p>
+                </div>
+            </section>
+
+            <section class="chat-container" aria-label="KIT FAQ chat">
+                <div class="chat-header">
+                    <div class="bot-identity">
+                        <span class="bot-avatar" aria-hidden="true">AI</span>
+                        <span>
+                            <strong>KIT Assistant</strong>
+                            <small>FAQ support</small>
+                        </span>
+                    </div>
+                    <button type="button" class="clear-button" id="clear-button">Clear chat</button>
+                </div>
+
+                <div class="chat-box" id="chat-box" aria-live="polite">
+                    <div class="message bot-message">
+                        Hello! I can help with official KIT information. Choose an example or type your question below.
+                    </div>
+                </div>
+
+                <form class="chat-form" id="chat-form">
+                    <label class="sr-only" for="question">Ask a question</label>
+                    <input
+                        type="text"
+                        id="question"
+                        placeholder="Ask a question about KIT..."
+                        autocomplete="off"
+                        maxlength="500"
+                        required
+                    >
+                    <button type="submit" id="send-button">Send</button>
+                </form>
+                <p class="chat-disclaimer">Answers are limited to the approved KIT FAQ catalogue.</p>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <span>KIT FAQ Assistant</span>
+            <span>For official decisions, please contact the relevant KIT office.</span>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

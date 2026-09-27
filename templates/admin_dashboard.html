@@ -1,0 +1,82 @@
+{% extends "admin_base.html" %}
+{% block title %}Overview · KIT FAQ Console{% endblock %}
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Knowledge operations</p>
+        <h1>Overview</h1>
+        <p>Maintain the approved knowledge base and review how people use the chatbot.</p>
+    </div>
+    <a class="button primary" href="{{ url_for('admin_faq_new') }}">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+        Create FAQ
+    </a>
+</header>
+
+<section class="stats-grid" aria-label="Catalogue summary">
+    <article class="stat-card published-card"><span class="stat-label">Published</span><strong>{{ stats.published }}</strong><small>Available to the chatbot</small></article>
+    <article class="stat-card draft-card"><span class="stat-label">Drafts</span><strong>{{ stats.draft }}</strong><small>Awaiting publication</small></article>
+    <article class="stat-card archived-card"><span class="stat-label">Archived</span><strong>{{ stats.archived }}</strong><small>Retained for history</small></article>
+    <article class="stat-card unanswered-card"><span class="stat-label">Unanswered</span><strong>{{ stats.unanswered }}</strong><small>Knowledge gaps found</small></article>
+    <article class="stat-card helpful-card"><span class="stat-label">Helpful</span><strong>{{ stats.helpful }}</strong><small>Positive responses</small></article>
+    <article class="stat-card unhelpful-card"><span class="stat-label">Not helpful</span><strong>{{ stats.not_helpful }}</strong><small>Needs review</small></article>
+</section>
+
+<section class="content-card">
+    <div class="section-heading">
+        <div><h2>FAQ catalogue</h2><p>{{ faqs|length }} governed records across all states</p></div>
+        <div class="section-actions"><a href="{{ url_for('admin_faq_import') }}">Import</a><a href="{{ url_for('admin_faq_export') }}">Export</a></div>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Question</th><th>Category</th><th>Status</th><th>Version</th><th>Last verified</th><th><span class="sr-only">Actions</span></th></tr></thead>
+            <tbody>
+                {% for faq in faqs %}
+                <tr>
+                    <td class="question-cell"><strong>{{ faq.question }}</strong><small>{{ faq.id }}</small></td>
+                    <td><span class="category-pill">{{ faq.category }}</span></td>
+                    <td><span class="status {{ faq.status }}"><i></i>{{ faq.status }}</span></td>
+                    <td>v{{ faq.version }}</td>
+                    <td>{{ faq.last_verified or 'Not recorded' }}</td>
+                    <td class="action-cell"><a class="row-action" href="{{ url_for('admin_faq_edit', faq_id=faq.id) }}">Edit <span aria-hidden="true">→</span></a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6"><div class="empty-state"><strong>No FAQs yet</strong><span>Create the first governed answer for the chatbot.</span></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="activity-grid">
+    <section class="content-card activity-card">
+        <div class="section-heading"><div><h2>Unanswered questions</h2><p>Recent gaps in the catalogue</p></div></div>
+        <ul class="activity-list">
+            {% for item in unanswered %}
+            <li><span class="activity-badge warning">{{ item.reason|replace('_', ' ') }}</span><p>{{ item.question }}</p><time>{{ item.created_at }}</time></li>
+            {% else %}<li class="empty-state"><strong>No unanswered questions</strong><span>New gaps will appear here.</span></li>{% endfor %}
+        </ul>
+    </section>
+    <section class="content-card activity-card">
+        <div class="section-heading"><div><h2>Answer feedback</h2><p>Latest user ratings</p></div></div>
+        <ul class="activity-list">
+            {% for item in feedback %}
+            <li><span class="activity-badge {{ 'positive' if item.rating == 'up' else 'negative' }}">{{ 'Helpful' if item.rating == 'up' else 'Not helpful' }}</span><p>{{ item.question }}</p><time>{{ item.created_at }}</time></li>
+            {% else %}<li class="empty-state"><strong>No feedback yet</strong><span>User ratings will appear here.</span></li>{% endfor %}
+        </ul>
+    </section>
+</div>
+
+<section class="content-card">
+    <div class="section-heading"><div><h2>Audit trail</h2><p>Recent administrative activity</p></div></div>
+    <div class="table-wrap compact-table">
+        <table>
+            <thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Record</th></tr></thead>
+            <tbody>
+                {% for item in audit %}<tr><td>{{ item.created_at }}</td><td>{{ item.actor }}</td><td><span class="audit-action">{{ item.action|replace('_', ' ') }}</span></td><td>{{ item.target_id or '—' }}</td></tr>
+                {% else %}<tr><td colspan="4"><div class="empty-state"><strong>No activity recorded</strong></div></td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

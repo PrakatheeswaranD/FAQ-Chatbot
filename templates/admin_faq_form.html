@@ -1,0 +1,63 @@
+{% extends "admin_base.html" %}
+{% block title %}{{ 'Edit FAQ' if faq.id else 'New FAQ' }} · KIT FAQ Console{% endblock %}
+{% block content %}
+<header class="page-heading">
+    <div>
+        <a class="breadcrumb" href="{{ url_for('admin_dashboard') }}">← FAQ catalogue</a>
+        <h1>{{ 'Edit FAQ' if faq.id else 'Create a new FAQ' }}</h1>
+        <p>{{ 'Update this governed answer and its publication status.' if faq.id else 'Add a reviewed answer to the managed knowledge base.' }}</p>
+    </div>
+    {% if faq.id %}<span class="record-id">{{ faq.id }} · v{{ faq.version }}</span>{% endif %}
+</header>
+
+{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+
+{% if preview %}
+<section class="answer-preview">
+    <div class="preview-heading"><span>Answer preview</span><small>This is how the stored response will appear.</small></div>
+    <div class="preview-message"><p>{{ faq.answer }}</p>{% if faq.answer_ta %}<hr><p lang="ta">{{ faq.answer_ta }}</p>{% endif %}</div>
+</section>
+{% endif %}
+
+<form method="post" class="editor-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="form-card">
+        <div class="form-card-heading"><span class="step-number">1</span><div><h2>Question and answer</h2><p>Write one clear question and a complete approved response.</p></div></div>
+        <div class="form-fields">
+            <div class="field-group full-span"><label for="faq-question">Question <em>Required</em></label><input id="faq-question" name="question" maxlength="500" value="{{ faq.question or '' }}" placeholder="For example: What are the library working hours?" required></div>
+            <div class="field-group full-span"><label for="faq-answer">English answer <em>Required</em></label><textarea id="faq-answer" name="answer" rows="6" maxlength="5000" placeholder="Enter the approved answer exactly as it should appear" required>{{ faq.answer or '' }}</textarea><small>Answers are shown verbatim. The chatbot will not rewrite this text.</small></div>
+            <div class="field-group full-span"><label for="faq-answer-ta">Tamil answer <span>Optional</span></label><textarea id="faq-answer-ta" name="answer_ta" rows="6" maxlength="5000" lang="ta" placeholder="Reviewed Tamil translation">{{ faq.answer_ta or '' }}</textarea></div>
+        </div>
+    </section>
+
+    <section class="form-card">
+        <div class="form-card-heading"><span class="step-number">2</span><div><h2>Governance</h2><p>Classify the record and control when it becomes available.</p></div></div>
+        <div class="form-fields two-up">
+            <div class="field-group"><label for="faq-category">Category</label><input id="faq-category" name="category" value="{{ faq.category or 'general' }}" pattern="[a-z0-9_-]{1,50}" required></div>
+            <div class="field-group"><label for="faq-status">Status</label><select id="faq-status" name="status">{% for status in ['draft', 'published', 'archived'] %}<option value="{{ status }}" {% if faq.status == status %}selected{% endif %}>{{ status|capitalize }}</option>{% endfor %}</select><small>Only published records can answer users.</small></div>
+            <div class="field-group"><label for="effective-from">Effective from <span>Optional</span></label><input id="effective-from" type="datetime-local" name="effective_from" value="{{ faq.effective_from or '' }}"></div>
+            <div class="field-group"><label for="last-verified">Last verified</label><input id="last-verified" type="date" name="last_verified" value="{{ faq.last_verified or '' }}"></div>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        <a class="button quiet" href="{{ url_for('admin_dashboard') }}">Cancel</a>
+        <button name="action" value="preview" class="button secondary" type="submit">Preview answer</button>
+        <button name="action" value="save" class="button primary" type="submit">{{ 'Save changes' if faq.id else 'Create FAQ' }}</button>
+    </div>
+</form>
+
+{% if versions %}
+<section class="content-card version-section">
+    <div class="section-heading"><div><h2>Version history</h2><p>Restore an earlier saved version if needed.</p></div></div>
+    <div class="table-wrap compact-table"><table><thead><tr><th>Version</th><th>Changed</th><th>Administrator</th><th></th></tr></thead><tbody>{% for version in versions %}<tr><td><strong>v{{ version.version }}</strong></td><td>{{ version.changed_at }}</td><td>{{ version.changed_by }}</td><td class="action-cell"><form method="post" action="{{ url_for('admin_faq_rollback', faq_id=faq.id, version_id=version.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-button" type="submit">Restore version</button></form></td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endif %}
+
+{% if faq.id %}
+<section class="danger-zone">
+    <div><h2>Archive this FAQ</h2><p>Archived records remain in history but cannot be used as chatbot answers.</p></div>
+    <form method="post" action="{{ url_for('admin_faq_archive', faq_id=faq.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="button danger">Archive FAQ</button></form>
+</section>
+{% endif %}
+{% endblock %}
