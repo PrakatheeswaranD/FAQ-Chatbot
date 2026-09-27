@@ -24,7 +24,7 @@ jobs:
       - run: pip install pip-audit
       - run: pip-audit -r requirements.txt
       - run: docker build -t kit-faq-chatbot:test .
-      - uses: aquasecurity/trivy-action@0.36.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: kit-faq-chatbot:test
           format: table
